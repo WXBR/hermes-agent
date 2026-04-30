@@ -86,7 +86,7 @@ jobs:
 
             - [ ] **Apply lockfile fix** — tick to push a commit with the correct hashes to this PR branch
             - Or [run the Nix Lockfile Fix workflow](${{ github.server_url }}/${{ github.repository }}/actions/workflows/nix-lockfile-fix.yml) manually (pass PR `#${{ github.event.pull_request.number }}`)
-            - Or locally: `nix run .#fix-lockfiles -- --apply` and commit the diff
+            - Or locally: `nix run .#fix-lockfiles` and commit the diff
 
       # Clear the sticky comment when either the build passed outright (no
       # hash check needed) or the hash check explicitly returned stale=false
@@ -106,7 +106,7 @@ jobs:
         if: steps.flake.outcome == 'failure' || steps.build.outcome == 'failure'
         run: |
           if [ "${{ steps.hash_check.outputs.stale }}" == "true" ]; then
-            echo "::error::Nix build failed due to stale npm lockfile hash. Run: nix run .#fix-lockfiles -- --apply"
+            echo "::error::Nix build failed due to stale npm lockfile hash. Run: nix run .#fix-lockfiles"
           else
             echo "::error::Nix build/flake check failed. See logs above."
           fi

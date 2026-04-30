@@ -92,7 +92,7 @@
               sed -i "s|hash = \"sha256-[A-Za-z0-9+/=]+\"|hash = \"$NEW_HASH\";|" "$NIX_FILE"
               echo "${pname}: updated hash to $NEW_HASH"
             else
-              echo "${pname}: warning: prefetch failed, run 'nix run .#fix-lockfiles -- --apply' manually" >&2
+              echo "${pname}: warning: prefetch failed, run 'nix run .#fix-lockfiles' manually" >&2
             fi
 
             mkdir -p .nix-stamps
@@ -112,6 +112,7 @@
   # Invocations:
   #   fix-lockfiles --check   # exit 1 if any hash is stale
   #   fix-lockfiles --apply   # rewrite stale hashes in place
+  #   fix-lockfiles           # alias of --apply
   # Writes machine-readable fields (stale, changed, report) to $GITHUB_OUTPUT
   # when set, so CI workflows can post a sticky PR comment directly.
   mkFixLockfiles =
@@ -124,7 +125,7 @@
     in
     pkgs.writeShellScriptBin "fix-lockfiles" ''
       set -uox pipefail
-      MODE="''${1:---check}"
+      MODE="''${1:---apply}"
       case "$MODE" in
         --check|--apply) ;;
         -h|--help)
@@ -222,7 +223,7 @@
       if [ "$STALE" -eq 1 ] && [ "$MODE" = "--check" ]; then
         echo
         echo "Stale lockfile hashes detected. Run:"
-        echo "  nix run .#fix-lockfiles -- --apply"
+        echo "  nix run .#fix-lockfiles"
         exit 1
       fi
 
